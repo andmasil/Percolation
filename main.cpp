@@ -1,5 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
+
+#include "Percolation.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +18,9 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
+
+    Percolation per(20*20);
+    engine.rootContext()->setContextProperty("Percolation", &per);
 
     return app.exec();
 }
