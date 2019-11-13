@@ -12,8 +12,6 @@ QuickFind::QuickFind(int N) : UnionFindBase(N)
 
 void QuickFind::connect(int p, int q)
 {
-    //cout << "QuickFind connect " << p << " - " << q << endl;
-
 	if (!isConnected(p, q) && (p < m_count) && (q < m_count))
 	{
 		int pid = m_idArray[p];
@@ -39,9 +37,7 @@ bool QuickFind::isConnected(int p, int q)
 	{
 		result = true;
 	}
-
-    //cout << "QuickFind isConnected (" << p << " - " << q << ") = " << boolalpha << result << endl;
-	return result;
+    return result;
 }
 
 /* EXAMPLE

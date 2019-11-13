@@ -7,6 +7,7 @@ public:
 
     virtual void connect(int p, int q) = 0;
     virtual bool isConnected(int p, int q) = 0;
+    virtual void reset();
 
 protected:
 	int count();

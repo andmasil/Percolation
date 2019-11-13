@@ -17,8 +17,6 @@ WeightedQuickUnion::WeightedQuickUnion(int N) : UnionFindBase(N)
 
 void WeightedQuickUnion::connect(int p, int q)
 {
-    //cout << "WeightedQuickUnion connect " << p << " - " << q << endl;
-
 	if (!isConnected(p, q) && (p < m_count) && (q < m_count))
 	{
 		int pRoot = getRoot(p);
@@ -48,10 +46,17 @@ bool WeightedQuickUnion::isConnected(int p, int q)
 	if ((p < m_count) && (q < m_count) && (getRoot(p) == getRoot(q)))
 	{
 		result = true;
-	}
+    }
+    return result;
+}
 
-    //cout << "WeightedQuickUnion isConnected (" << p << " - " << q << ") = " << boolalpha << result << endl;
-	return result;
+void WeightedQuickUnion::reset()
+{
+    for (int i = 0; i < m_count; ++i)
+    {
+        m_countArray[i] = 1;
+        m_idArray[i] = i;
+    }
 }
 
 int WeightedQuickUnion::getRoot(int i)

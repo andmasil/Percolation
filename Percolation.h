@@ -2,38 +2,43 @@
 #define PERCOLATION_H
 
 #include <QObject>
+#include <vector>
 #include "Union-Find/UnionFindBase.h"
 
 class Percolation : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(int sitesNumber READ getSitesNumber NOTIFY sitesNumberChanged)
-    //add model
+    Q_PROPERTY(bool finished READ getFinished NOTIFY getFinishedChanged)
+    Q_PROPERTY(QStringList qmlModel READ getQmlModel NOTIFY qmlModelChanged)
 
 public:
     explicit Percolation(int siteNumber, QObject *parent = nullptr);
     ~Percolation();
 
-    Q_INVOKABLE void openSite(int id);
-
-    int getSitesNumber() const
-    {
-        return m_sitesNumber;
-    }
+    bool getFinished() const {return m_finished;}
+    QStringList getQmlModel() const{ return m_qmlModel;}
+    Q_INVOKABLE void openNextRandomSite();
 
 signals:
-    void sitesNumberChanged(int sitesNumber);
+    void getFinishedChanged(bool finished);
+    void qmlModelChanged(QStringList qmlModel);
+    void stateChange(int id, QString color);
 
 private:
+    void openSite(int id);
     void checkNeighborhood(int id);
     void checkFlow();
     void reset();
+    int getRandomId();
 
     UnionFindBase* m_unionFind;
     int m_sitesNumber;
-    int* m_model;
+    std::vector<int> m_randomTable;
     int m_opened;
-    int m_blocked;
+    bool m_finished;
+    double m_sum;
+    int m_count;
+    QStringList m_qmlModel;
 };
 
 #endif // PERCOLATION_H

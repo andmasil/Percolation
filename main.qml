@@ -8,20 +8,38 @@ Window
     height: 480
     title: qsTr("Percolation")
 
+    Timer
+    {
+        interval: 1
+        running: !Percolation.finished
+        repeat: true
+
+        onTriggered: Percolation.openNextRandomSite()
+    }
+
+    Connections
+    {
+        target: Percolation
+
+        onStateChange: repeater.itemAt(id).backColor = color
+    }
+
     Grid
     {
         id: board
         anchors.fill: parent
-        anchors.margins: 10
-        columns: Math.sqrt(Percolation.sitesNumber)
-        rows: Math.sqrt(Percolation.sitesNumber)
+        columns: Math.sqrt(repeater.count)
+        rows: Math.sqrt(repeater.count)
 
         Repeater
         {
-            model: Percolation.sitesNumber
+            id: repeater
+            model: Percolation.qmlModel
 
             MouseArea
             {
+                property alias backColor: background.color
+                id: mouseArea
                 width: board.width / board.columns
                 height: board.height / board.rows
 
@@ -29,14 +47,8 @@ Window
                 {
                     id: background
                     anchors.fill: parent
-                    color: 'black'
+                    color: modelData
                     border.color: 'black'
-                }
-
-                onPressed:
-                {
-                    background.color = 'white'
-                    Percolation.openSite(index)
                 }
             }
         }

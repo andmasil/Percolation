@@ -8,6 +8,7 @@ public:
 
     void connect(int p, int q);
 	bool isConnected(int p, int q);
+    void reset();
 
 private:
 	int getRoot(int i);

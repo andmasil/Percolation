@@ -12,8 +12,6 @@ QuickUnion::QuickUnion(int N) : UnionFindBase(N)
 
 void QuickUnion::connect(int p, int q)
 {
-	cout << "QuickUnion connect " << p << " - " << q << endl;
-
 	if (!isConnected(p, q))
 	{
 		int pRoot = getRoot(p);
@@ -35,10 +33,9 @@ bool QuickUnion::isConnected(int p, int q)
 	{
 		result = true;
 	}
-
-	cout << "QuickUnion isConnected (" << p << " - " << q << ") = " << boolalpha << result << endl;
-	return result;
+    return result;
 }
+
 
 int QuickUnion::getRoot(int i)
 {

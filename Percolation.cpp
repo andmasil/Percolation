@@ -1,36 +1,57 @@
 #include <QDebug>
 #include <math.h>
+#include <algorithm>
 
 #include "Percolation.h"
 #include "Union-Find/WeightedQuickUnion.h"
+#include "Union-Find/QuickUnion.h"
+#include "Union-Find/QuickFind.h"
 
-const int BLOCKED = 0;
-const int OPENED = 1;
+const QString BLOCKED = "black";
+const QString OPENED = "white";
 
 Percolation::Percolation(int siteNumber, QObject *parent) :
     QObject(parent),
     m_sitesNumber(siteNumber),
+    m_randomTable(),
     m_opened(0),
-    m_blocked(siteNumber)
+    m_finished(false),
+    m_sum(0.0),
+    m_count(0),
+    m_qmlModel()
 {
-    m_unionFind = new WeightedQuickUnion(siteNumber);
-    m_model = new int[siteNumber];
+    m_unionFind = new QuickFind(siteNumber);
+    //m_unionFind = new QuickUnion(siteNumber);
+    //m_unionFind = new WeightedQuickUnion(siteNumber);
     reset();
 }
 
 Percolation::~Percolation()
 {
     delete m_unionFind;
-    delete m_model;
+}
+
+void Percolation::openNextRandomSite()
+{
+    int id = m_randomTable.back();
+    if ((id >= 0) && (id < m_qmlModel.size()))
+    {
+        m_randomTable.pop_back();
+        openSite(id);
+    }
 }
 
 void Percolation::openSite(int id)
 {
-    if (BLOCKED == m_model[id])
+    if (m_finished)
     {
-        m_model[id] = OPENED;
+        reset();
+    }
+    else if (BLOCKED == m_qmlModel[id])
+    {
+        m_qmlModel[id] = OPENED;
+        emit stateChange(id, OPENED);
         m_opened++;
-        m_blocked--;
         checkNeighborhood(id);
         checkFlow();
     }
@@ -44,19 +65,19 @@ void Percolation::checkNeighborhood(int id)
     int up = id - inRow;
     int down = id + inRow;
 
-    if ((right >= 0) && (right < m_sitesNumber) && (m_model[right] == OPENED))
+    if ((right >= 0) && (right < m_sitesNumber) && (m_qmlModel[right] == OPENED))
     {
         m_unionFind->connect(id, right);
     }
-    if ((left >= 0) && (left < m_sitesNumber) && (m_model[left] == OPENED))
+    if ((left >= 0) && (left < m_sitesNumber) && (m_qmlModel[left] == OPENED))
     {
         m_unionFind->connect(id, left);
     }
-    if ((up >= 0) && (up < m_sitesNumber) && (m_model[up] == OPENED))
+    if ((up >= 0) && (up < m_sitesNumber) && (m_qmlModel[up] == OPENED))
     {
         m_unionFind->connect(id, up);
     }
-    if ((down >= 0) && (down < m_sitesNumber) && (m_model[down] == OPENED))
+    if ((down >= 0) && (down < m_sitesNumber) && (m_qmlModel[down] == OPENED))
     {
         m_unionFind->connect(id, down);
     }
@@ -76,20 +97,35 @@ void Percolation::checkFlow()
         }
         if (result) break;
     }
-    qDebug() << "checkFlow" << result;
+
     if (result)
     {
         double threshold = ((double)m_opened/(double)m_sitesNumber);
-        qDebug() << "percolation threshold is" << m_opened << "/" << m_sitesNumber << "=" << threshold;
+        m_sum += threshold;
+        m_count++;
+        double average = (m_sum/m_count);
+        m_finished = true;
+        qDebug() << "****************************************";
+        qDebug() << "Percolation threshold is" << m_opened << "/" << m_sitesNumber << "=" << threshold;
+        qDebug() << "Average from" << m_count << "is" << average << "(" << (average*m_sitesNumber) << ")";
     }
 }
 
 void Percolation::reset()
 {
-    m_opened = 0;
-    m_blocked = m_sitesNumber;
+    m_randomTable.clear();
+    m_qmlModel.clear();
+    emit qmlModelChanged(m_qmlModel);
     for (int i = 0; i < m_sitesNumber; ++i)
     {
-        m_model[i] = BLOCKED;
+        m_qmlModel.push_back(BLOCKED);
+        m_randomTable.push_back(i);
     }
+    std::srand(time(0));
+    std::random_shuffle(m_randomTable.begin(), m_randomTable.end());
+    emit qmlModelChanged(m_qmlModel);
+    m_unionFind->reset();
+    m_opened = 0;
+    m_finished = false;
+    emit getFinishedChanged(m_finished);
 }

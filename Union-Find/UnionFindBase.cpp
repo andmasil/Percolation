@@ -1,6 +1,5 @@
 #include "UnionFindBase.h"
 #include <iostream>
-#include <string>
 
 using namespace std;
 
@@ -16,7 +15,15 @@ UnionFindBase::UnionFindBase(int N)
 
 UnionFindBase::~UnionFindBase()
 {
-	delete[] m_idArray;
+    delete[] m_idArray;
+}
+
+void UnionFindBase::reset()
+{
+    for (int i = 0; i < m_count; ++i)
+    {
+        m_idArray[i] = i;
+    }
 }
 
 int UnionFindBase::count()
