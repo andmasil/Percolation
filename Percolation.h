@@ -30,6 +30,7 @@ private:
     void checkFlow();
     void reset();
     int getRandomId();
+    bool sameRow(int id1, int id2, int inRow);
 
     UnionFindBase* m_unionFind;
     int m_sitesNumber;

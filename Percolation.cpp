@@ -65,11 +65,11 @@ void Percolation::checkNeighborhood(int id)
     int up = id - inRow;
     int down = id + inRow;
 
-    if ((right >= 0) && (right < m_sitesNumber) && (m_qmlModel[right] == OPENED))
+    if ((right >= 0) && (right < m_sitesNumber) && sameRow(id, right, inRow) && (m_qmlModel[right] == OPENED))
     {
         m_unionFind->connect(id, right);
     }
-    if ((left >= 0) && (left < m_sitesNumber) && (m_qmlModel[left] == OPENED))
+    if ((left >= 0) && (left < m_sitesNumber) && sameRow(id, left, inRow) && (m_qmlModel[left] == OPENED))
     {
         m_unionFind->connect(id, left);
     }
@@ -128,4 +128,9 @@ void Percolation::reset()
     m_opened = 0;
     m_finished = false;
     emit getFinishedChanged(m_finished);
+}
+
+bool Percolation::sameRow(int id1, int id2, int inRow)
+{
+    return ((id1/inRow) == (id2/inRow));
 }
